@@ -3,12 +3,11 @@
 #include <tidy.h>
 #include <tidybuffio.h>
 
-size_t write_cb(char *ptr, size_t size, size_t nmemb, char *userdata) {
-
-printf("%s\n", "pr");
-//printf("%s\n", ptr);
-printf("%zu\n", nmemb);
-//printf("%zu\n", nmemb);
+size_t write_cb(char *parseres, size_t size, size_t nmemb, TidyBuffer *userdata) {
+uint r;
+  r = size * nmemb;
+  tidyBufAppend(userdata, parseres, r);
+  return r;
 return size*nmemb;
 }
 
@@ -49,7 +48,7 @@ printf("%s\n", "main");
 CURL *curl;
 int err;
 curl = curl_easy_init();
-curl_easy_setopt(curl, CURLOPT_URL, "https://mosfarr.ru/category/%d0%bd%d0%be%d0%b2%d0%be%d1%81%d1%82%d0%b8/");
+curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 err = curl_easy_perform(curl);
