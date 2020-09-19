@@ -3,12 +3,12 @@
 #include <tidy.h>
 #include <tidybuffio.h>
 
-size_t write_cb(char *parseres, size_t size, size_t nmemb, TidyBuffer *userdata) {
+size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
 uint r;
   r = size * nmemb;
-  tidyBufAppend(userdata, parseres, r);
-  return r;
-return size*nmemb;
+  tidyBufAppend(userdata, in, r);
+  printf("write %s\n", in);  
+return r;
 }
 
 /* Traverse the document tree */ 
@@ -20,7 +20,7 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
     if(name) {
       /* if it has a name, then it's an HTML tag ... */ 
       TidyAttr attr;
-      printf("%*.*s%s ", indent, indent, "<", name);
+      printf("%*.*s%s ", indent, indent, "z", name);
       /* walk the attribute list */ 
       for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
         printf(tidyAttrName(attr));
@@ -46,40 +46,46 @@ int main(int argc, char **argv)
 {
 printf("%s\n", "main");
 CURL *curl;
+TidyDoc tdoc; 
+TidyBuffer docbuf = {0};
+TidyBuffer tidy_errbuf = {0};
 int err;
 curl = curl_easy_init();
 curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-err = curl_easy_perform(curl);
-printf("%s\n", curl_easy_strerror(err));
-TidyDoc tdoc = tidyCreate();
-TidyBuffer docbuf = {0};
+printf("curl %s\n", curl_easy_strerror(err));
+tdoc = tidyCreate();
 tidyOptSetBool(tdoc, TidyForceOutput, yes);
 tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
+curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
 
- if(!err) {
-      err = tidyParseBuffer(tdoc, &docbuf); /* parse the input */ 
-      if(err >= 0) {
-        err = tidyCleanAndRepair(tdoc); /* fix any problems */ 
-        if(err >= 0) {
-          err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
-          if(err >= 0) {
-            dumpNode(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
-            //fprintf(stderr, "%s\n", tidy_errbuf.bp); /* show errors */ 
-          }
-        }
-      }
-    }
+err = curl_easy_perform(curl);
+//printf("%d\n", err);
+
+ //if(!err) {
+   //   err = tidyParseBuffer(tdoc, &docbuf); /* parse the input */
+//	printf("%d\n", err);
+  //    if(err >= 0) {
+    //    err = tidyCleanAndRepair(tdoc); /* fix any problems */ 
+      //  if(err >= 0) {
+        //  err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
+        //  if(err >= 0) {
+           //dumpNode(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
+          //  printf(stderr, "tidy %s\n", tidy_errbuf.bp); /* show errors */ 
+         // }
+       // }
+    //  }
+   // }
    // else
    //   fprintf(stderr, "%s\n", curl_errbuf);
  
     /* clean-up */ 
     curl_easy_cleanup(curl);
-    tidyBufFree(&docbuf);
+  //  tidyBufFree(&docbuf);
     //tidyBufFree(&tidy_errbuf);
-    tidyRelease(tdoc);
+  //  tidyRelease(tdoc);
     return err;
 
 }
