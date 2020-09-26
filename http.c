@@ -20,7 +20,7 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
     if(name) {
       /* if it has a name, then it's an HTML tag ... */ 
       TidyAttr attr;
-      printf("%*.*s%s ", indent, indent, "z", name);
+      printf("%*.*s%s ", indent, indent, " parsed ", name);
       /* walk the attribute list */ 
       for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
         printf(tidyAttrName(attr));
@@ -51,10 +51,9 @@ TidyBuffer docbuf = {0};
 TidyBuffer tidy_errbuf = {0};
 int err;
 curl = curl_easy_init();
-curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
+curl_easy_setopt(curl, CURLOPT_URL, "https://mosfarr.ru/category/новости");
 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-printf("curl %s\n", curl_easy_strerror(err));
 tdoc = tidyCreate();
 tidyOptSetBool(tdoc, TidyForceOutput, yes);
 tidyOptSetInt(tdoc, TidyWrapLen, 4096);
@@ -62,24 +61,27 @@ tidyBufInit(&docbuf);
 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
 
 err = curl_easy_perform(curl);
+
+printf("curl %s%d\n", curl_easy_strerror(err), err);
 //printf("%d\n", err);
 
- //if(!err) {
-   //   err = tidyParseBuffer(tdoc, &docbuf); /* parse the input */
-//	printf("%d\n", err);
-  //    if(err >= 0) {
-    //    err = tidyCleanAndRepair(tdoc); /* fix any problems */ 
-      //  if(err >= 0) {
-        //  err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
-        //  if(err >= 0) {
-           //dumpNode(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
-          //  printf(stderr, "tidy %s\n", tidy_errbuf.bp); /* show errors */ 
-         // }
-       // }
-    //  }
-   // }
-   // else
-   //   fprintf(stderr, "%s\n", curl_errbuf);
+ if(!err) {
+      err = tidyParseBuffer(tdoc, &docbuf); /* parse the input */
+	printf("%d\n", err);
+      if(err >= 0) {
+        err = tidyCleanAndRepair(tdoc); /* fix any problems */ 
+        if(err >= 0) {
+          err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
+          if(err >= 0) {
+           dumpNode(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
+            printf(stderr, "tidy %s\n", tidy_errbuf.bp); /* show errors */ 
+          }
+        }
+      }
+    }
+    else
+      
+	printf("curl %s%d\n", curl_easy_strerror(err), err);
  
     /* clean-up */ 
     curl_easy_cleanup(curl);
