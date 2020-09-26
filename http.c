@@ -42,6 +42,18 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
 }
 
 
+void dumpMosfarr(TidyDoc doc, TidyNode tnod, int indent)
+{
+  TidyNode child;
+  for(child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
+    ctmbstr name = tidyNodeGetName(child);
+    if(name) {
+      /* if it has a name, then it's an HTML tag ... */ 
+      printf("FARR %s\n", name);
+    		}
+	dumpMosfarr(doc, child, indent);
+}
+}
 int main(int argc, char **argv)
 {
 printf("%s\n", "main");
@@ -73,7 +85,7 @@ printf("curl %s%d\n", curl_easy_strerror(err), err);
         if(err >= 0) {
           err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
           if(err >= 0) {
-           dumpNode(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
+           dumpMosfarr(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
             printf(stderr, "tidy %s\n", tidy_errbuf.bp); /* show errors */ 
           }
         }
