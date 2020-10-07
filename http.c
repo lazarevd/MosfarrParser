@@ -7,7 +7,7 @@ size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
 uint r;
   r = size * nmemb;
   tidyBufAppend(userdata, in, r);
-  printf("write %s\n", in);  
+//  printf("write %s\n", in);  
 return r;
 }
 
@@ -20,7 +20,7 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
     if(name) {
       /* if it has a name, then it's an HTML tag ... */ 
       TidyAttr attr;
-      printf("%*.*s%s ", indent, indent, " parsed ", name);
+      printf("%*.*s%s ", indent, indent, "<", name);
       /* walk the attribute list */ 
       for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
         printf(tidyAttrName(attr));
@@ -41,17 +41,36 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
   }
 }
 
-
 void dumpMosfarr(TidyDoc doc, TidyNode tnod, int indent)
 {
   TidyNode child;
-  for(child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
-    ctmbstr name = tidyNodeGetName(child);
+
+    ctmbstr name = tidyNodeGetName(tnod);
+
+    
+      TidyBuffer buf;
+      tidyBufInit(&buf);
+      tidyNodeGetText(doc, tnod, &buf);
+      printf("%s\n", buf.bp);
+      tidyBufFree(&buf);
+  
+   if(name == "body") {
+child = tidyGetBody(tnod);
+
+
+    name = tidyNodeGetName(child);
+
+    printf("%s%s\n", " child ", name);
+}
+
+for(child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
+    name = tidyNodeGetName(child);
+//    printf("farr %s\n", name);
     if(name) {
       /* if it has a name, then it's an HTML tag ... */ 
-      printf("FARR %s\n", name);
+      printf("FARR %s%d\n", name, indent);
     		}
-	dumpMosfarr(doc, child, indent);
+	dumpMosfarr(doc, child, indent++);
 }
 }
 int main(int argc, char **argv)
@@ -85,7 +104,9 @@ printf("curl %s%d\n", curl_easy_strerror(err), err);
         if(err >= 0) {
           err = tidyRunDiagnostics(tdoc); /* load tidy error buffer */ 
           if(err >= 0) {
-           dumpMosfarr(tdoc, tidyGetRoot(tdoc), 0); /* walk the tree */ 
+		TidyNode root = tidyGetRoot(tdoc);
+           //dumpMosfarr(tdoc, root, 0); /* walk the tree */ 
+           dumpNode(tdoc, root, 0); /* walk the tree */ 
             printf(stderr, "tidy %s\n", tidy_errbuf.bp); /* show errors */ 
           }
         }

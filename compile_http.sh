@@ -1,3 +1,3 @@
 rm http
-gcc -o http  http.c -lcurl -ltidy
-./http
+gcc -g -o http  http.c -lcurl -ltidy
+
