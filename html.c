@@ -12,16 +12,17 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
   for(child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
     ctmbstr name = tidyNodeGetName(child);
     if(name) {
+	printf("node name: %s\n", name);
       /* if it has a name, then it's an HTML tag ... */ 
       TidyAttr attr;
-      printf("%*.*s%s ", indent, indent, "<", name);
+      //printf("%*.*s%s ", indent, indent, "<", name);
       /* walk the attribute list */ 
       for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
-        printf("%s\n", tidyAttrName(attr));
-        tidyAttrValue(attr)?printf("=\"%s\" ",
+        printf("attr name: %s\n", tidyAttrName(attr));
+        tidyAttrValue(attr)?printf("attr val: %s\n",
                                    tidyAttrValue(attr)):printf(" ");
       }
-      printf(">\n");
+     // printf(">\n");
     }
   //  else {
       /* if it doesn't have a name, then it's probably text, cdata, etc... */ 
@@ -40,17 +41,19 @@ i++;
 
 
 
-int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultNode) {
+int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultNode,int resultInitSize) {
   TidyNode child;
+  int resultSize = 0;
   for(child = tidyGetChild(parentNode); child; child = tidyGetNext(child) ) {
     ctmbstr name = tidyNodeGetName(child);
-   // printf("%s\n", name);
-    if(strcmp(name, findName) == 0)  {
-*resultNode = child;
-return 0;
+//    printf("%s\n", name);
+    if(name && strcmp(name, findName) == 0 
+	&& resultSize < resultInitSize)  {
+resultNode[resultSize] = child;
+resultSize++;
    }
 }
-return 1;
+return resultSize;
 }
 
 
@@ -91,19 +94,24 @@ tidyParseString(tdoc, buffer);
 TidyNode body = tidyGetBody(tdoc);
 int res = -1;
 
-TidyNode resNd;
-res = getNodeByName(body, "main", &resNd); 
-res = getNodeByName(resNd, "div", &resNd); 
-//res = getNodeByName(resNd, "th", &resNd); 
+int initSize = 10;
+TidyNode resNd[initSize];
+res = getNodeByName(body, "main", resNd, initSize); 
+res = getNodeByName(resNd[0], "div", resNd, initSize); 
+res = getNodeByName(resNd[0], "div", resNd, initSize); 
+res = getNodeByName(resNd[0], "div", resNd, initSize); 
+res = getNodeByName(resNd[0], "div", resNd, initSize); 
 // start to process your data / extract strings here...
 //printHtNodes(tdoc, root);
-printf("%s%s\n","RESULT:" ,  tidyNodeGetName(resNd));
+
+printf("%s%s\n","RESULT:" ,  tidyNodeGetName(resNd[0]));
       TidyBuffer buf;
       tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, resNd, &buf);
+      tidyNodeGetText(tdoc, resNd[0], &buf);
       printf("%s%s\n", "TEXT", (char*)buf.bp);
       tidyBufFree(&buf);
-//dumpNode(tdoc, body, 0);
+
+//dumpNode(tdoc, resNd, 0);
 }
 
 tidyRelease(tdoc);
