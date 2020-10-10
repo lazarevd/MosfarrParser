@@ -11,6 +11,31 @@ TidyNode * nodes
 */
 
 
+struct NewsBlock {
+    int id;
+    char * date;
+    char * title;
+    char * url;
+    char * body;
+};
+
+void initNewsBlock(struct NewsBlock * newsBlock, size_t sz ) {
+for (int i = 0; i < sz; i++) {
+newsBlock[i].date = malloc(sizeof(char) * 12);
+newsBlock[i].title = malloc(sizeof(char) * 500);
+newsBlock[i].url = malloc(sizeof(char) * 700);
+newsBlock[i].body = malloc(sizeof(char) * 700);
+}
+}
+void freeNewsBlock(struct NewsBlock * newsBlock, size_t sz ) {
+for (int i = 0; i < sz; i++) {
+free(newsBlock[i].date);
+free(newsBlock[i].title);
+free(newsBlock[i].url);
+free(newsBlock[i].body);
+}
+}
+
 void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
 {
   TidyNode child;
@@ -46,14 +71,12 @@ i++;
 
 void printNode(TidyDoc tdoc, TidyNode tnod)
 {
-  TidyNode child;
+  ctmbstr name = tidyNodeGetName(tnod);
   int i = 0;
-  for(child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
-    ctmbstr name = tidyNodeGetName(child);
     if(name) {
-	printf("node name: %s\n", name);
+	printf("nod name: %s\n", name);
       TidyAttr attr;
-      for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
+      for(attr = tidyAttrFirst(tnod); attr; attr = tidyAttrNext(attr) ) {
         printf("attr name: %s\n", tidyAttrName(attr));
         tidyAttrValue(attr)?printf("attr val: %s\n",
                                    tidyAttrValue(attr)):printf(" ");
@@ -64,13 +87,16 @@ void printNode(TidyDoc tdoc, TidyNode tnod)
       /* if it doesn't have a name, then it's probably text, cdata, etc... */ 
       TidyBuffer buf;
       tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, child, &buf);
+      tidyNodeGetText(tdoc, tnod, &buf);
       printf("TEXT: %s\n", buf.bp?(char *)buf.bp:"");
       tidyBufFree(&buf);
     }
 i++;
-  }
 }
+
+
+
+
 int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize) {
   TidyNode child;
   int resultSize = 0;
@@ -103,21 +129,24 @@ int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr,in
 //    printf("%s\n", name);
     if(name && strcmp(name, findName) == 0 
 	&& resultSize < resultInitSize)  {
-resultArr[resultSize] = child;
-resultSize++;
+resultArr[resultSize] = child;resultSize++;
    }
 }
 return resultSize;
 }
 
-struct NewsBlock {
-    int id;
-    char date[16];
-    char title[200];
-    char url[300];
-    char body[300];
-};
 
+
+void nodeGetText(TidyDoc doc, TidyNode node, char * textDest) {
+
+     // char * res = malloc(sz);
+      TidyBuffer buf;
+      tidyBufInit(&buf);
+      tidyNodeGetText(doc, node, &buf);
+      strcpy(textDest, buf.bp?(char *)buf.bp:"");
+      tidyBufFree(&buf);
+      //return res;
+}
 
 int fillNewsStruct(TidyDoc tdoc,
 		  TidyNode * nodesArr, 
@@ -131,32 +160,25 @@ for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
 TidyNode tmpNode[1];
 getNodeByClass(nodesArr[i], "item-block item-news", tmpNode, 1);
 getNodeByClass(tmpNode[0], "date", tmpNode, 1);
-
-//printNode(tdoc, tmpNode[0]);
+//dumpNode(tdoc, tmpNode[0],1);
+printNode(tdoc, tmpNode[0]);
 TidyNode child; 
- for(child = tidyGetChild(tmpNode[0]); child; child = tidyGetNext(child) )  { 
+child = tidyGetChild(tmpNode[0]); 
+printNode(tdoc, child);
 
-      TidyBuffer buf;
-      tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, child, &buf);
-      printf("%s%s\n", "TEXT", (char*)buf.bp);
-      tidyBufFree(&buf);
-}
+//char * dt = nodeGetText(tdoc, child, 16);
 
-/*
+//printf("%s\n", dt);
 
-*/
-/*
-printf("%s%s\n","RESULT:" ,  tidyNodeGetName(nodesArr[i]));
-      TidyBuffer buf;
-      tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, nodesArr[i], &buf);
-      printf("%s%s\n", "TEXT", (char*)buf.bp);
-      tidyBufFree(&buf);
-*/
+nodeGetText(tdoc, child, newsArr[i].date);
+
+res++;
+//free(dt);
 }
 return res;
 }
+
+
 int parseHtml(char * html, struct NewsBlock * out, size_t out_sz) {
 int res = -1;
 TidyDoc tdoc; 
@@ -196,7 +218,6 @@ return res;
 
 
 
-
 int main(int argc, char **argv)
 {
 
@@ -226,13 +247,17 @@ if (f)
   fclose (f);
 }
 
-struct NewsBlock * news;
+size_t newsSize = 20;
+
+struct NewsBlock  news[newsSize];
+
+initNewsBlock(news, newsSize);
 
 int r = 0;
-parseHtml(buffer, news, 10);
+r = parseHtml(buffer, news, newsSize);
 printf("%d/n", r);
+
+freeNewsBlock(news, newsSize);
 }
-
-
 
 
