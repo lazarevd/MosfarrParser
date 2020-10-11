@@ -148,6 +148,31 @@ void nodeGetText(TidyDoc doc, TidyNode node, char * textDest) {
       //return res;
 }
 
+void setDate(TidyDoc tdoc,
+		  TidyNode newsNode,
+		  struct NewsBlock newsBlk) {
+
+TidyNode tmpNode[1];
+getNodeByClass(newsNode, "date", tmpNode, 1);
+tmpNode[0] = tidyGetChild(tmpNode[0]); 
+nodeGetText(tdoc, tmpNode[0], newsBlk.date);
+}
+
+void setUrl(TidyDoc tdoc,
+		  TidyNode newsNode,
+		  struct NewsBlock newsBlk) {
+
+TidyNode tmpNode[1];
+getNodeByName(newsNode, "a", tmpNode, 1);
+      TidyAttr attr;
+      for(attr = tidyAttrFirst(tmpNode[0]); attr; attr = tidyAttrNext(attr) ) {
+	ctmbstr attName = tidyAttrName(attr);      
+	ctmbstr attVal = tidyAttrValue(attr);      
+        if (strcmp("href", attName) == 0) {
+        strcpy(newsBlk.url, attVal);
+	}
+      }
+}
 int fillNewsStruct(TidyDoc tdoc,
 		  TidyNode * nodesArr, 
 		  size_t nodesArrSize, 
@@ -159,24 +184,18 @@ for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
 
 TidyNode tmpNode[1];
 getNodeByClass(nodesArr[i], "item-block item-news", tmpNode, 1);
-getNodeByClass(tmpNode[0], "date", tmpNode, 1);
-//dumpNode(tdoc, tmpNode[0],1);
-printNode(tdoc, tmpNode[0]);
-TidyNode child; 
-child = tidyGetChild(tmpNode[0]); 
-printNode(tdoc, child);
 
-//char * dt = nodeGetText(tdoc, child, 16);
-
-//printf("%s\n", dt);
-
-nodeGetText(tdoc, child, newsArr[i].date);
+setDate(tdoc, tmpNode[0], newsArr[i]);
+setUrl(tdoc, tmpNode[0], newsArr[i]);
 
 res++;
 //free(dt);
 }
 return res;
 }
+
+
+
 
 
 int parseHtml(char * html, struct NewsBlock * out, size_t out_sz) {
