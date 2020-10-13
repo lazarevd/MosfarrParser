@@ -3,12 +3,13 @@
 #include <tidy.h>
 #include <tidybuffio.h>
 
-size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
-uint r;
+/* curl write callback, to fill tidy's input buffer...  */ 
+uint write_cb(char *in, uint size, uint nmemb, TidyBuffer *out)
+{
+  uint r;
   r = size * nmemb;
-  tidyBufAppend(userdata, in, r);
-//  printf("write %s\n", in);  
-return r;
+  tidyBufAppend(out, in, r);
+  return r;
 }
 
 /* Traverse the document tree */ 
@@ -40,6 +41,7 @@ void dumpNode(TidyDoc doc, TidyNode tnod, int indent)
     dumpNode(doc, child, indent + 4); /* recursive */ 
   }
 }
+
 
 void dumpMosfarr(TidyDoc doc, TidyNode tnod, int indent)
 {
@@ -82,14 +84,15 @@ TidyBuffer docbuf = {0};
 TidyBuffer tidy_errbuf = {0};
 int err;
 curl = curl_easy_init();
-curl_easy_setopt(curl, CURLOPT_URL, "https://mosfarr.ru/category/новости");
+curl_easy_setopt(curl, CURLOPT_URL, "https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/");
 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
+curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 tdoc = tidyCreate();
 tidyOptSetBool(tdoc, TidyForceOutput, yes);
 tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
-curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
+
 
 err = curl_easy_perform(curl);
 
