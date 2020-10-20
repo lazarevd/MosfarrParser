@@ -1,2 +1,2 @@
-gcc -o bot -I~/sqlite/sqlite -L~/sqlite/sqlite  bot.c -lsqlite3
-./bot
+gcc -o sql -I~/sqlite/sqlite -L~/sqlite/sqlite  sql.c -lsqlite3
+./sql

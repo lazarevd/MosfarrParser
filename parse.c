@@ -239,17 +239,23 @@ TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
+int err = 0;
+//int err = getHtml("https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/", &docbuf);
 
-int err = getHtml("https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/", &docbuf);
 
 
+//size_t newsSize = 20;
+//struct NewsBlock news[newsSize];
+//initNewsBlocks(news, newsSize);
+//err = parseHtml(&docbuf, news, newsSize);
+//freeNewsBlocks(news, newsSize);
 
-size_t newsSize = 20;
-struct NewsBlock  news[newsSize];
-initNewsBlock(news, newsSize);
-err = parseHtml(&docbuf, news, newsSize);
-freeNewsBlock(news, newsSize);
+struct NewsBlock nbb;
 
+initNewsBlock(&nbb);
+//&nbb.title = "TIT";
+//printf("%s/n", &nbb->title);
+freeNewsBlock(&nbb);
 return err;
 
 }
