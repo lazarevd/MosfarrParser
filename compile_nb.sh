@@ -1,3 +1,3 @@
 rm nb
-gcc -g -o nb newsblock.c
+gcc -g -o nb newsblock.c -I/home/ubuntu/bot newsblock.h
 ./nb

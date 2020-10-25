@@ -1,13 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-
-struct NewsBlock {
-    int id;
-    char * date;
-    char * title;
-    char * url;
-    char * body;
-};
+#include "newsblock.h"
 
 void mallocNBFields(struct NewsBlock * nb) {
 nb->date = malloc(sizeof(char) * 12);
@@ -21,7 +14,8 @@ struct NewsBlock * mallocNewsBlock() {
 struct NewsBlock * nbt;
 nbt =  malloc(sizeof(struct NewsBlock));
 mallocNBFields(nbt);
-return nbt;}
+return nbt;
+}
 
 
 
@@ -56,23 +50,9 @@ free(newsBlock[i].body);
 }
 }
 
-
-
+/*
 int main(int argc, char **argv)
 {
-/*
-struct NewsBlock * nb;
-struct NewsBlock ** nb1;
-nb1 = &nb;
-struct NewsBlock * z;
-z = *nb1;
-z = malloc(sizeof(struct NewsBlock));
-z->date = malloc(sizeof(char) * 12);
-free(z->date);
-free(z);
-*/
-
-
 struct NewsBlock * nb;
 initNewsBlock(&nb);
 freeNewsBlock(nb);
@@ -90,7 +70,5 @@ strcpy(arr[3].url,"http://www.ru");
 
 freeNewsBlocks(arr, 10);
 free(arr);
-
-
-
 }
+*/
