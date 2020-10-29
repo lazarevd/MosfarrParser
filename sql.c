@@ -35,21 +35,21 @@ sqlite3_finalize(stmt);
 }
 
 
-int insertNewsBlock(sqlite3 * db, struct NewsBlock * nb) {
+int insertNewsBlock(sqlite3 * db, struct NewsBlock nb) {
 
 char query[4000] = "insert or ignore into news_blocks values(";
 
 char  i[100] = {0};
-sprintf(i, "%d", nb->id);
+sprintf(i, "%d", nb.id);
 strncat(query, &i[0],20);
 strcat(query, ", \"");
-strncat(query, nb->date, 12);
+strncat(query, nb.date, 12);
 strcat(query, "\", \"");
-strncat(query, nb->title, 500);
+strncat(query, nb.title, 500);
 strcat(query, "\", \"");
-strncat(query, nb->url, 700);
+strncat(query, nb.url, 700);
 strcat(query, "\", \"");
-strncat(query, nb->body, 700);
+strncat(query, nb.body, 700);
 strcat(query, "\", 0, 0)");
 
 char *err_msg = 0;
@@ -69,7 +69,7 @@ printf("%s\n", query);
 return rc;
 
 }
-
+/*
 int main(void) {
 
 sqlite3 *db;
@@ -94,5 +94,5 @@ free(nbs);
 return 0;
 }
 
-
+*/
 

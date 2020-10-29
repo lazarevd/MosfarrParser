@@ -1,5 +1,6 @@
 #include <stdlib.h>
-
+#ifndef H_NEWSBLOCK
+#define H_NEWSBLOCK
 struct NewsBlock {
     int id;
     char * date;
@@ -7,7 +8,7 @@ struct NewsBlock {
     char * url;
     char * body;
 };
-
+#endif
 
 void freeNewsBlock(struct NewsBlock * newsBlock );
 

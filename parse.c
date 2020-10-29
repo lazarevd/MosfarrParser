@@ -2,7 +2,9 @@
 #include <curl/curl.h>
 #include <tidy.h>
 #include <tidybuffio.h>
-#include <newsblock.h>
+#include "newsblock.h"
+#include <sqlite3.h>
+#include "sql.h"
 
 size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
 uint r;
@@ -239,23 +241,20 @@ TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
-int err = 0;
-//int err = getHtml("https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/", &docbuf);
+int err = getHtml("https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/", &docbuf);
 
+sqlite3 *db;
+char *err_msg = 0; 
+int rc = sqlite3_open_v2("rr.db", &db, SQLITE_OPEN_READWRITE,NULL);
+size_t newsSize = 20;
+struct NewsBlock news[newsSize];
+initNewsBlocks(news, newsSize);
+err = parseHtml(&docbuf, news, newsSize);
+//printf("%s, %s, %s", news[0].date, news[0].url, news[0].title);
+insertNewsBlock(db, news[0]);
+freeNewsBlocks(news, newsSize);
 
-
-//size_t newsSize = 20;
-//struct NewsBlock news[newsSize];
-//initNewsBlocks(news, newsSize);
-//err = parseHtml(&docbuf, news, newsSize);
-//freeNewsBlocks(news, newsSize);
-
-struct NewsBlock nbb;
-
-initNewsBlock(&nbb);
-//&nbb.title = "TIT";
-//printf("%s/n", &nbb->title);
-freeNewsBlock(&nbb);
+sqlite3_close(db);
 return err;
 
 }
