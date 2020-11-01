@@ -107,36 +107,6 @@ getNodeByName(newsNode, "a", tmpNode, 1);
 	}
       }
 }
-
-void setTitle(TidyDoc tdoc,
-		  TidyNode newsNode,
-		  struct NewsBlock newsBlk)
-{
-TidyNode tmpNode[1];
-getNodeByName(newsNode, "a", tmpNode, 1);
-getNodeByName(tmpNode[0], "h2", tmpNode, 1);
-tmpNode[0] = tidyGetChild(tmpNode[0]); 
-nodeGetText(tdoc, tmpNode[0], newsBlk.title);
-}
-
-
-void setBody(TidyDoc tdoc,
-		  TidyNode newsNode,
-		  struct NewsBlock newsBlk)
-{
-/*
-TidyNode tmpNode[1];
-getNodeByName(newsNode, "a", tmpNode, 1);
-getNodeByName(tmpNode[0], "h2", tmpNode, 1);
-tmpNode[0] = tidyGetChild(tmpNode[0]); 
-nodeGetText(tdoc, tmpNode[0], newsBlk.title);
-*/
-strcpy(newsBlk.body,"");
-}
-
-
-
-
 int fillNewsStruct(TidyDoc tdoc,
 		  TidyNode * nodesArr, 
 		  size_t nodesArrSize, 
@@ -151,9 +121,6 @@ getNodeByClass(nodesArr[i], "item-block item-news", tmpNode, 1);
 
 setDate(tdoc, tmpNode[0], newsArr[i]);
 setUrl(tdoc, tmpNode[0], newsArr[i]);
-setTitle(tdoc, tmpNode[0], newsArr[i]);
-setBody(tdoc, tmpNode[0], newsArr[i]);
-
 
 res++;
 //free(dt);
@@ -210,8 +177,8 @@ initNewsBlocks(news, newsSize);
 err = parseHtml(&docbuf, news, newsSize);
 //printf("%s, %s, %s", news[0].date, news[0].url, news[0].title);
 for (int i=0; i < newsSize; i++) {
-//printf("%s\n", news[i].title);
-insertNewsBlock(db, news[i]);
+printf("%s\n", news[i].title);
+//insertNewsBlock(db, news[i]);
 }
 
 freeNewsBlocks(news, newsSize);
