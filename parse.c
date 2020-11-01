@@ -13,6 +13,16 @@ uint r;
 return r;
 }
 
+int hash(char * input) {
+int res = 0;
+int i = 0;
+while(input[i] != '\0') {
+res = 31 * res + input[i];
+i++;
+}
+return res;
+}
+
 
 int getHtml(char* url, TidyBuffer * docbuf) {
 int ret = 0;

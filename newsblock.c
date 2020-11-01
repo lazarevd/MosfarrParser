@@ -2,11 +2,13 @@
 #include <string.h>
 #include "newsblock.h"
 
+#define UNICODE_BYTES 4
+
 void mallocNBFields(struct NewsBlock * nb) {
-nb->date = malloc(sizeof(char) * 12);
-nb->title = malloc(sizeof(char) * 500);
-nb->url = malloc(sizeof(char) * 700);
-nb->body = malloc(sizeof(char) * 700);
+nb->date = malloc(sizeof(char) * 12 * UNICODE_BYTES);
+nb->title = malloc(sizeof(char) * 500 * UNICODE_BYTES);
+nb->url = malloc(sizeof(char) * 700 * UNICODE_BYTES);
+nb->body = malloc(sizeof(char) * 700 * UNICODE_BYTES);
 }
 
 
