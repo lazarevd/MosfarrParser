@@ -5,6 +5,7 @@
 #define UNICODE_BYTES 4
 
 void mallocNBFields(struct NewsBlock * nb) {
+nb->id = malloc(sizeof(int));
 nb->date = malloc(sizeof(char) * 12 * UNICODE_BYTES);
 nb->title = malloc(sizeof(char) * 500 * UNICODE_BYTES);
 nb->url = malloc(sizeof(char) * 700 * UNICODE_BYTES);
@@ -22,6 +23,7 @@ return nbt;
 
 
 void freeNewsBlock(struct NewsBlock * newsBlock ) {
+free(newsBlock->id);
 free(newsBlock->date);
 free(newsBlock->title);
 free(newsBlock->url);
@@ -45,6 +47,7 @@ mallocNBFields(newsBlock+i);
 
 void freeNewsBlocks(struct NewsBlock * newsBlock, size_t sz ) {
 for (int i = 0; i < sz; i++) {
+free(newsBlock[i].id);
 free(newsBlock[i].date);
 free(newsBlock[i].title);
 free(newsBlock[i].url);

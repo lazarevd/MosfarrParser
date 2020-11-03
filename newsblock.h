@@ -2,7 +2,7 @@
 #ifndef H_NEWSBLOCK
 #define H_NEWSBLOCK
 struct NewsBlock {
-    int id;
+    int * id;
     char * date;
     char * title;
     char * url;

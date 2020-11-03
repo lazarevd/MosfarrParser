@@ -114,7 +114,12 @@ getNodeByName(newsNode, "a", tmpNode, 1);
 	ctmbstr attVal = tidyAttrValue(attr);      
         if (strcmp("href", attName) == 0) {
         strcpy(newsBlk.url, attVal);
-	}
+	char * t = malloc(1000);
+	strcpy(t,attVal);
+	int i = hash(t);
+	*newsBlk.id = i;
+	printf("%s%d", "nb ", *newsBlk.id);	
+}
       }
 }
 
@@ -220,7 +225,7 @@ initNewsBlocks(news, newsSize);
 err = parseHtml(&docbuf, news, newsSize);
 //printf("%s, %s, %s", news[0].date, news[0].url, news[0].title);
 for (int i=0; i < newsSize; i++) {
-//printf("%s\n", news[i].title);
+//printf("%d\n", *news[i].id);
 insertNewsBlock(db, news[i]);
 }
 

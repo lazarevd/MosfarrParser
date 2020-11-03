@@ -19,7 +19,7 @@ if (rc != SQLITE_OK) {
 int cnt = 0;
 while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && cnt < arrSz) {
     int id           = sqlite3_column_int (stmt, 0);
-    nbs[cnt].id = id;
+    *nbs[cnt].id = id;
     const char *date = sqlite3_column_text(stmt, 1);
     strcpy(nbs[cnt].date, date);
     const char *title = sqlite3_column_text(stmt, 2);
@@ -40,7 +40,7 @@ int insertNewsBlock(sqlite3 * db, struct NewsBlock nb) {
 char query[4000] = "insert or ignore into news_blocks values(";
 
 char  i[100] = {0};
-sprintf(i, "%d", nb.id);
+sprintf(i, "%d", *nb.id);
 strncat(query, &i[0],20);
 strcat(query, ", \"");
 strncat(query, nb.date, 12);
