@@ -10,9 +10,9 @@ struct NewsBlock {
 };
 #endif
 
-void freeNewsBlock(struct NewsBlock * newsBlock );
-
 void initNewsBlock(struct NewsBlock ** newsBlock);
+
+void freeNewsBlock(struct NewsBlock * newsBlock );
 
 void initNewsBlocks(struct NewsBlock * newsBlock, size_t sz );
 
