@@ -5,6 +5,7 @@
 #include "newsblock.h"
 #include <sqlite3.h>
 #include "sql.h"
+#include "sender.h"
 
 size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
 uint r;
@@ -227,10 +228,19 @@ err = parseHtml(&docbuf, news, newsSize);
 for (int i=0; i < newsSize; i++) {
 //printf("%d\n", *news[i].id);
 insertNewsBlock(db, news[i]);
+setSent(db, news[i], 1);
+setProcessing(db, news[i], 1);
 }
 
-freeNewsBlocks(news, newsSize);
+CURL *curl;
+curl = curl_easy_init();
 
+char url[200] = "https://api.telegram.org/bot";
+strcat(url, "token");
+strcat(url, "/sendMessage");
+sendNewsBlock(curl, url, "chat", news[0],db);
+freeNewsBlocks(news, newsSize);
+curl_easy_cleanup(curl);
 sqlite3_close(db);
 return err;
 

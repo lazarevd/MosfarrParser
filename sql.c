@@ -25,8 +25,7 @@ while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && cnt < arrSz) {
     const char *title = sqlite3_column_text(stmt, 2);
     strcpy(nbs[cnt].title, title);
     const char *url = sqlite3_column_text(stmt, 3);
-    strcpy(nbs[cnt].url, url);
-    
+    strcpy(nbs[cnt].url, url);   
     //printf("%d=%s\n", id, name); 
     cnt++;
 }
@@ -34,6 +33,47 @@ sqlite3_finalize(stmt);
 
 }
 
+int executeQuery(sqlite3 * db, char * query) {
+
+char *err_msg = 0;
+int rc = sqlite3_exec(db, query, 0, 0, &err_msg);
+    
+    if (rc != SQLITE_OK ) {
+        
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        
+        sqlite3_free(err_msg);        
+        sqlite3_close(db);
+        
+        return 1;
+    } 
+
+printf("%s\n", query);
+return rc;
+}
+
+int setProcessing(sqlite3 * db, struct NewsBlock nb, int val) {
+char query[200] = "update news_blocks set processing =  ";
+char i[100];
+sprintf(i, "%d", val);
+strcat(query, &i[0]);
+strcat(query, " where id = ");
+sprintf(i, "%d", *nb.id);
+strcat(query, &i[0]);
+return executeQuery(db, &query[0]);
+}
+
+
+int setSent(sqlite3 * db, struct NewsBlock nb, int val) {
+char query[200] = "update news_blocks set sent = ";
+char i[100];
+sprintf(i, "%d", val);
+strcat(query, &i[0]);
+strcat(query, " where id = ");
+sprintf(i, "%d", *nb.id);
+strcat(query, &i[0]);
+return executeQuery(db, &query[0]);
+}
 
 int insertNewsBlock(sqlite3 * db, struct NewsBlock nb) {
 
@@ -52,21 +92,9 @@ strcat(query, "\", \"");
 strncat(query, nb.body, 700);
 strcat(query, "\", 0, 0)");
 
-char *err_msg = 0;
-int rc = sqlite3_exec(db, query, 0, 0, &err_msg);
-    
-    if (rc != SQLITE_OK ) {
-        
-        fprintf(stderr, "SQL error: %s\n", err_msg);
-        
-        sqlite3_free(err_msg);        
-        sqlite3_close(db);
-        
-        return 1;
-    } 
 
-printf("%s\n", query);
-return rc;
+
+return executeQuery(db, &query[0]);
 
 }
 /*

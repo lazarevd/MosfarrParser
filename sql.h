@@ -8,3 +8,7 @@ void selectNewsBlocksFromDb(sqlite3 * db,
 
 
 int insertNewsBlock(sqlite3 * db, struct NewsBlock  nb);
+
+int setProcessing(sqlite3 * db, struct NewsBlock nb, int val);
+
+int setSent(sqlite3 * db, struct NewsBlock nb, int val);

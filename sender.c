@@ -2,12 +2,14 @@
 #include <curl/curl.h>
 #include "newsblock.h"
 #include <string.h>
+#include "sql.h"
 
 int sendNewsBlock(CURL * curl,
 char * url,
 char * chatId,		 
-struct NewsBlock * nb) {
-
+struct NewsBlock nb,
+sqlite3 * db) {
+setProcessing(db, nb, 1);
 int res = 0;
 struct curl_slist *list = NULL;
 list = curl_slist_append(list, "Content-Type: application/json");
@@ -19,9 +21,13 @@ strcat(body, chatId);
 strcat(body, "\",\"text\":\"0_o\", \"parse_mode\":\"HTML\"}");
 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
 res = curl_easy_perform(curl);
+if (res == 0) {
+setSent(db, nb, 1);
+}
+setProcessing(db, nb, 0);
 return res;
 }
-
+/*
 int main(int argc, char **argv){
 CURL *curl;
 curl = curl_easy_init();
@@ -39,4 +45,4 @@ freeNewsBlock(nbk);
 
 curl_easy_cleanup(curl);
 
-}
+}*/
