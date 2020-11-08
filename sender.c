@@ -18,7 +18,9 @@ curl_easy_setopt(curl, CURLOPT_URL, url);
 curl_easy_setopt(curl, CURLOPT_POST, 1L);
 char body[2000] = "{\"chat_id\":\""; 
 strcat(body, chatId);
-strcat(body, "\",\"text\":\"0_o\", \"parse_mode\":\"HTML\"}");
+strcat(body, "\",\"text\":\"");
+strcat(body, nb.title);
+strcat(body, "\", \"parse_mode\":\"HTML\"}");
 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
 res = curl_easy_perform(curl);
 if (res == 0) {

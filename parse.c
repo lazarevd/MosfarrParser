@@ -211,6 +211,11 @@ return res;
 /* Traverse the document tree */ 
 int main(int argc, char **argv)
 {
+if (argc < 2) {
+printf("%s\n", "usage: ./parse token chat_id");
+exit(1);
+}
+
 TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
@@ -225,22 +230,32 @@ struct NewsBlock news[newsSize];
 initNewsBlocks(news, newsSize);
 err = parseHtml(&docbuf, news, newsSize);
 //printf("%s, %s, %s", news[0].date, news[0].url, news[0].title);
-for (int i=0; i < newsSize; i++) {
-//printf("%d\n", *news[i].id);
-insertNewsBlock(db, news[i]);
-setSent(db, news[i], 1);
-setProcessing(db, news[i], 1);
-}
 
+//TEST
+setSent(db,news[0],0);
+
+int selected = 0; 
+selected = selectUnsentNewsBlocksFromDb(db,news, newsSize);
+if (selected > 0){
 CURL *curl;
 curl = curl_easy_init();
-
 char url[200] = "https://api.telegram.org/bot";
-strcat(url, "token");
+strcat(url, argv[1]);
 strcat(url, "/sendMessage");
-sendNewsBlock(curl, url, "chat", news[0],db);
-freeNewsBlocks(news, newsSize);
+
+printf("%s\n", url);
+
+for (int i=0; i < selected; i++) {
+setProcessing(db, news[i], 1);
+sendNewsBlock(curl, url, argv[2], news[0],db);
+setSent(db, news[i], 1);
+setProcessing(db, news[i], 0);
+}
 curl_easy_cleanup(curl);
+}
+
+freeNewsBlocks(news, newsSize);
+
 sqlite3_close(db);
 return err;
 

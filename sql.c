@@ -4,10 +4,12 @@
 #include <stdlib.h>
 #include "newsblock.h"
 
-void selectNewsBlocksFromDb(sqlite3 * db, 
+int selectUnsentNewsBlocksFromDb(sqlite3 * db, 
 			    struct NewsBlock * nbs,
 			    size_t arrSz) {
-char *sql = "SELECT * FROM news_blocks";
+char *sql = 	"SELECT * FROM news_blocks "
+		"WHERE processing = 0 "
+		"AND sent = 0";
 
 sqlite3_stmt *stmt;
 
@@ -30,7 +32,7 @@ while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && cnt < arrSz) {
     cnt++;
 }
 sqlite3_finalize(stmt);
-
+return cnt;
 }
 
 int executeQuery(sqlite3 * db, char * query) {
