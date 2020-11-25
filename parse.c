@@ -208,9 +208,9 @@ tidyRelease(tdoc);
 return res;
 }
 
-/* Traverse the document tree */ 
-int main(int argc, char **argv)
-{
+
+int startParsing(int argc, char **argv) {
+
 if (argc < 2) {
 printf("%s\n", "usage: ./parse token chat_id");
 exit(1);
@@ -264,4 +264,13 @@ freeNewsBlocks(news, newsSize);
 sqlite3_close(db);
 return err;
 
+
+}
+
+
+
+/* Traverse the document tree */ 
+int main(int argc, char **argv)
+{
+startParsing(argc, argv);
 }
