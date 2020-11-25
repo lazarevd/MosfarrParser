@@ -1,2 +1,0 @@
-rlwrap sqlite3 mydb.db
-gcc -o bot -I~/sqlite/sqlite -L~/sqlite/sqlite -lsqlite3 bot.c
