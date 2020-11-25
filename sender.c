@@ -20,8 +20,11 @@ char body[2000] = "{\"chat_id\":\"";
 strcat(body, chatId);
 strcat(body, "\",\"text\":\"");
 strcat(body, nb.title);
+strcat(body, "\n");
+strcat(body, nb.url);
 strcat(body, "\", \"parse_mode\":\"HTML\"}");
 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
+printf("%s %d/n", "start send to chat message", *nb.id);
 res = curl_easy_perform(curl);
 if (res == 0) {
 setSent(db, nb, 1);

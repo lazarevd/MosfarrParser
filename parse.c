@@ -119,7 +119,7 @@ getNodeByName(newsNode, "a", tmpNode, 1);
 	strcpy(t,attVal);
 	int i = hash(t);
 	*newsBlk.id = i;
-	printf("%s%d", "nb ", *newsBlk.id);	
+	printf("%s%d\n", "nb ", *newsBlk.id);	
 }
       }
 }
@@ -221,6 +221,10 @@ TidyBuffer docbuf = {0};
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
 int err = getHtml("https://mosfarr.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8/", &docbuf);
+if (err) {
+printf("get%d\n", err);
+exit(2);
+}
 
 sqlite3 *db;
 char *err_msg = 0; 
@@ -228,14 +232,15 @@ int rc = sqlite3_open_v2("rr.db", &db, SQLITE_OPEN_READWRITE,NULL);
 size_t newsSize = 20;
 struct NewsBlock news[newsSize];
 initNewsBlocks(news, newsSize);
-err = parseHtml(&docbuf, news, newsSize);
-//printf("%s, %s, %s", news[0].date, news[0].url, news[0].title);
 
-//TEST
-setSent(db,news[0],0);
 
-int selected = 0; 
-selected = selectUnsentNewsBlocksFromDb(db,news, newsSize);
+int parsed = parseHtml(&docbuf, news, newsSize);
+printf("parsed %d news\n", parsed);
+for (int i = 0; i < parsed; i++){
+	insertNewsBlock(db, news[i]);
+}
+
+int selected = selectUnsentNewsBlocksFromDb(db,news, newsSize);
 if (selected > 0){
 CURL *curl;
 curl = curl_easy_init();
@@ -247,7 +252,7 @@ printf("%s\n", url);
 
 for (int i=0; i < selected; i++) {
 setProcessing(db, news[i], 1);
-sendNewsBlock(curl, url, argv[2], news[0],db);
+sendNewsBlock(curl, url, argv[2], news[i],db);
 setSent(db, news[i], 1);
 setProcessing(db, news[i], 0);
 }
