@@ -1,1 +1,6 @@
-*.c.sw*
+*.sw*
+*.*.sw*
+fdsarrParser
+mosfarrParser
+*.log
+*.db

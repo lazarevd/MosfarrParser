@@ -10,6 +10,8 @@ int getHtml(char* url, TidyBuffer * docbuf);
 
 int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize);
 
+int getNodeById(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize);
+
 int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr,int resultInitSize);
 
 void nodeGetText(TidyDoc doc, TidyNode node, char * textDest);

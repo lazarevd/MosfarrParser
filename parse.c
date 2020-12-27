@@ -44,7 +44,8 @@ return err;
 
 
 
-int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize) {
+int getNodeByAttribute(TidyNode parentNode, ctmbstr findName, ctmbstr findAttName, 
+		TidyNode * resultArr, int resultInitSize) {
   TidyNode child;
   int resultSize = 0;
   for(child = tidyGetChild(parentNode); child; child = tidyGetNext(child) ) {
@@ -54,7 +55,7 @@ int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, 
       for(attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr) ) {
 	ctmbstr attName = tidyAttrName(attr);      
 	ctmbstr attVal = tidyAttrValue(attr);      
-        if (strcmp("class", attName) == 0 
+        if (strcmp(findAttName, attName) == 0 
 	&& strcmp(findName, attVal) == 0
         && resultSize < resultInitSize) {
 		resultArr[resultSize] = child;
@@ -66,6 +67,17 @@ int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, 
 return resultSize;
 }
 
+
+
+
+int getNodeByClass(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize) {
+return getNodeByAttribute(parentNode, findName, "class", resultArr, resultInitSize);
+}
+
+
+int getNodeById(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr, int resultInitSize) {
+return getNodeByAttribute(parentNode, findName, "id", resultArr, resultInitSize);
+}
 
 int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr,int resultInitSize) {
   TidyNode child; 
@@ -92,3 +104,8 @@ void nodeGetText(TidyDoc doc, TidyNode node, char * textDest) {
       tidyBufFree(&buf);
       //return res;
 }
+
+
+
+
+/* Traverse the document tree */ 
