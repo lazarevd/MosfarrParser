@@ -7,6 +7,7 @@
 #include "sql.h"
 #include "sender.h"
 #include "parse.h"
+#include "utils.h"
 
 void setDate(TidyDoc tdoc,
 		  TidyNode newsNode,
@@ -69,20 +70,26 @@ int fillNewsStruct(TidyDoc tdoc,
 int res = 0;
 
 for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
-
+printf("%d", i);
 TidyNode tmpNode[1];
-getNodeByClass(nodesArr[i], "item-block item-news", tmpNode, 1);
 
-setDate(tdoc, tmpNode[0], newsArr[i]);
-setUrl(tdoc, tmpNode[0], newsArr[i]);
-setTitle(tdoc, tmpNode[0], newsArr[i]);
-setBody(tdoc, tmpNode[0], newsArr[i]);
+printNode(tdoc, nodesArr[i], 150);
+//setDate(tdoc, tmpNode[0], newsArr[i]);
+//setUrl(tdoc, tmpNode[0], newsArr[i]);
+//setTitle(tdoc, tmpNode[0], newsArr[i]);
+//setBody(tdoc, tmpNode[0], newsArr[i]);
 
 
+TidyBuffer buf;
+      tidyBufInit(&buf);
+      tidyNodeGetText(tdoc, tmpNode[0], &buf);
+      printf("%s\n", buf.bp?(char *)buf.bp:"");
+      tidyBufFree(&buf);
 res++;
 }
 return res;
 }
+
 
 
 int parseHtml(TidyBuffer * docbuf, struct NewsBlock * out, size_t out_sz) {
@@ -102,20 +109,19 @@ TidyNode body = tidyGetBody(tdoc);
 TidyNode resNd[out_sz];
 res = getNodeByName(body, "section", resNd, 1); 
 res = getNodeById(resNd[0], "newswrap", resNd, 1); 
-res = getNodeByClass(resNd[0], "news-list div-with-shadow", resNd, 1); 
+res = getNodeByClass(resNd[0], "content-wrap", resNd, 1);
+res = getNodeByClass(resNd[0], "news-list div-with-shadow", resNd, 1);
 res = getNodeByName(resNd[0], "ul", resNd, 1); 
-TidyBuffer buf;
-      tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, resNd[0], &buf);
-      printf("%s\n", buf.bp?(char *)buf.bp:"");
-      tidyBufFree(&buf);
-//fillNewsStruct(tdoc, resNd, res, out, out_sz);
+res = getNodeByName(resNd[0], "li", resNd, 20); 
+fillNewsStruct(tdoc, resNd, res, out, out_sz);
 }
 
 tidyBufFree(docbuf);
 tidyRelease(tdoc);
 return res;
 }
+
+
 
 int main(int argc, char **argv)
 {

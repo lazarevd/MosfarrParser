@@ -6,10 +6,10 @@
 
 void mallocNBFields(struct NewsBlock * nb) {
 nb->id = malloc(sizeof(int));
-nb->date = malloc(sizeof(char) * 12 * UNICODE_BYTES);
-nb->title = malloc(sizeof(char) * 500 * UNICODE_BYTES);
-nb->url = malloc(sizeof(char) * 700 * UNICODE_BYTES);
-nb->body = malloc(sizeof(char) * 700 * UNICODE_BYTES);
+nb->date = malloc(sizeof(char) * MAX_DATE_LENGTH * UNICODE_BYTES);
+nb->title = malloc(sizeof(char) * MAX_TITLE_LENGTH * UNICODE_BYTES);
+nb->url = malloc(sizeof(char) * MAX_URL_LENGTH * UNICODE_BYTES);
+nb->body = malloc(sizeof(char) * MAX_BODY_LENGTH * UNICODE_BYTES);
 }
 
 
