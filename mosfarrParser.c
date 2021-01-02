@@ -34,7 +34,8 @@ getNodeByName(newsNode, "a", tmpNode, 1);
 	strcpy(t,attVal);
 	int i = hash(t);
 	*newsBlk.id = i;
-	printf("%s%d\n", "nb ", *newsBlk.id);	
+	printf("%s%d\n", "nb ", *newsBlk.id);
+	free(t);	
 }
       }
 }

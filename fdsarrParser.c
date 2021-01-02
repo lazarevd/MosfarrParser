@@ -9,12 +9,22 @@
 #include "parse.h"
 #include "utils.h"
 
+void getAttrVal(TidyNode tNode, char* findAttrName, char* resultValue) {
+	TidyAttr attr;
+      for(attr = tidyAttrFirst(tNode); attr; attr = tidyAttrNext(attr) ) {
+	ctmbstr attName = tidyAttrName(attr);      
+	ctmbstr attVal = tidyAttrValue(attr);      
+        	if (strcmp(findAttrName, attName) == 0) {
+        	strcpy(resultValue, attVal);
+		}
+	}
+} 
 void setDate(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk) {
 
 TidyNode tmpNode[1];
-getNodeByClass(newsNode, "date", tmpNode, 1);
+getNodeByName(newsNode, "p", tmpNode, 1); 
 tmpNode[0] = tidyGetChild(tmpNode[0]); 
 nodeGetText(tdoc, tmpNode[0], newsBlk.date);
 }
@@ -25,20 +35,22 @@ void setUrl(TidyDoc tdoc,
 
 TidyNode tmpNode[1];
 getNodeByName(newsNode, "a", tmpNode, 1);
-      TidyAttr attr;
-      for(attr = tidyAttrFirst(tmpNode[0]); attr; attr = tidyAttrNext(attr) ) {
-	ctmbstr attName = tidyAttrName(attr);      
-	ctmbstr attVal = tidyAttrValue(attr);      
-        if (strcmp("href", attName) == 0) {
-        strcpy(newsBlk.url, attVal);
+
 	char * t = malloc(1000);
+	char * attVal = malloc(1000);
+	getAttrVal(tmpNode[0], "src", attVal);
 	strcpy(t,attVal);
+	strcpy(newsBlk.url, attVal);
 	int i = hash(t);
 	*newsBlk.id = i;
-	printf("%s%d\n", "nb ", *newsBlk.id);	
+//	printf("%s%d\n", "nb ", *newsBlk.id);	
+	free(t);
+	free(attVal);
 }
-      }
-}
+
+
+
+
 
 void setTitle(TidyDoc tdoc,
 		  TidyNode newsNode,
@@ -70,21 +82,18 @@ int fillNewsStruct(TidyDoc tdoc,
 int res = 0;
 
 for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
-printf("%d", i);
+//printf("%d", i);
 TidyNode tmpNode[1];
 
-printNode(tdoc, nodesArr[i], 150);
-//setDate(tdoc, tmpNode[0], newsArr[i]);
-//setUrl(tdoc, tmpNode[0], newsArr[i]);
+
+//printNode(tdoc, tmpNode[0], 350);
+setDate(tdoc, nodesArr[i], newsArr[i]);
+setUrl(tdoc, nodesArr[i], newsArr[i]);
+printf("%s\n", newsArr[i].url);
 //setTitle(tdoc, tmpNode[0], newsArr[i]);
 //setBody(tdoc, tmpNode[0], newsArr[i]);
 
 
-TidyBuffer buf;
-      tidyBufInit(&buf);
-      tidyNodeGetText(tdoc, tmpNode[0], &buf);
-      printf("%s\n", buf.bp?(char *)buf.bp:"");
-      tidyBufFree(&buf);
 res++;
 }
 return res;
@@ -112,7 +121,7 @@ res = getNodeById(resNd[0], "newswrap", resNd, 1);
 res = getNodeByClass(resNd[0], "content-wrap", resNd, 1);
 res = getNodeByClass(resNd[0], "news-list div-with-shadow", resNd, 1);
 res = getNodeByName(resNd[0], "ul", resNd, 1); 
-res = getNodeByName(resNd[0], "li", resNd, 20); 
+res = getNodeByName(resNd[0], "li", resNd, 1); 
 fillNewsStruct(tdoc, resNd, res, out, out_sz);
 }
 
