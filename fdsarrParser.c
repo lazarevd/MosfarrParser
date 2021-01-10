@@ -25,19 +25,21 @@ void setDate(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk) {
 
-TidyNode tmpNode[1];
+TidyNode tmpNode[1] = {0};
 getNodeByName(newsNode, "p", tmpNode, 1); 
+if (tmpNode[0]) {
 tmpNode[0] = tidyGetChild(tmpNode[0]); 
 nodeGetText(tdoc, tmpNode[0], newsBlk.date);
+}
 }
 
 void setUrl(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk) {
 
-TidyNode tmpNode[1];
+TidyNode tmpNode[1] = {0};
 getNodeByName(newsNode, "a", tmpNode, 1);
-
+	if (tmpNode[0]) {
 	char * urlVal = malloc(1000);
 	char * attrVal = malloc(1000);
 	getAttrVal(tmpNode[0], "href", attrVal);
@@ -51,6 +53,7 @@ getNodeByName(newsNode, "a", tmpNode, 1);
 	free(attrVal);
 	free(urlVal);
 }
+}
 
 
 
@@ -60,14 +63,18 @@ void setTitle(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk)
 {
-TidyNode tmpNode[1];
-getNodeByName(newsNode, "a", tmpNode, 1);
-TidyNode titleNode[1];
-getNodeByName(tmpNode[0], "h3", titleNode, 1);
-if (titleNode[0]){ 
-titleNode[0] = tidyGetChild(titleNode[0]); 
-nodeGetText(tdoc, titleNode[0], newsBlk.title);
+TidyNode titleNode[1] = {0};
+getNodeByName(newsNode, "div", titleNode, 1);
+	if (titleNode[0]){ //top new
+		getNodeByName(titleNode[0], "h3", titleNode, 1);
+	} else {
+	getNodeByName(newsNode, "h3", titleNode, 1);
+	}
+		if (titleNode[0]) { //other news
+	titleNode[0] = tidyGetChild(titleNode[0]); 
+	nodeGetText(tdoc, titleNode[0], newsBlk.title);
 }
+
 }
 
 
