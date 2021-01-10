@@ -9,13 +9,15 @@
 #include "parse.h"
 #include "utils.h"
 
+#define BASE_URL "https://fdsarr.ru"
+
 void getAttrVal(TidyNode tNode, char* findAttrName, char* resultValue) {
 	TidyAttr attr;
       for(attr = tidyAttrFirst(tNode); attr; attr = tidyAttrNext(attr) ) {
 	ctmbstr attName = tidyAttrName(attr);      
 	ctmbstr attVal = tidyAttrValue(attr);      
         	if (strcmp(findAttrName, attName) == 0) {
-        	strcpy(resultValue, attVal);
+        	strlcpy(resultValue, attVal, 1000);
 		}
 	}
 } 
@@ -36,16 +38,18 @@ void setUrl(TidyDoc tdoc,
 TidyNode tmpNode[1];
 getNodeByName(newsNode, "a", tmpNode, 1);
 
-	char * t = malloc(1000);
-	char * attVal = malloc(1000);
-	getAttrVal(tmpNode[0], "src", attVal);
-	strcpy(t,attVal);
-	strcpy(newsBlk.url, attVal);
-	int i = hash(t);
+	char * urlVal = malloc(1000);
+	char * attrVal = malloc(1000);
+	getAttrVal(tmpNode[0], "href", attrVal);
+	strlcpy(urlVal, BASE_URL, MAX_URL_LENGTH);
+	strcat(urlVal, attrVal);
+	strlcpy(newsBlk.url, urlVal, MAX_URL_LENGTH);
+	int i = hash(urlVal);
 	*newsBlk.id = i;
-//	printf("%s%d\n", "nb ", *newsBlk.id);	
-	free(t);
-	free(attVal);
+	//printf("%s%d\n", "nb ", *newsBlk.id);	
+	//printf("%s%s\n", "url ", newsBlk.url);	
+	free(attrVal);
+	free(urlVal);
 }
 
 
@@ -58,9 +62,12 @@ void setTitle(TidyDoc tdoc,
 {
 TidyNode tmpNode[1];
 getNodeByName(newsNode, "a", tmpNode, 1);
-getNodeByName(tmpNode[0], "h2", tmpNode, 1);
-tmpNode[0] = tidyGetChild(tmpNode[0]); 
-nodeGetText(tdoc, tmpNode[0], newsBlk.title);
+TidyNode titleNode[1];
+getNodeByName(tmpNode[0], "h3", titleNode, 1);
+if (titleNode[0]){ 
+titleNode[0] = tidyGetChild(titleNode[0]); 
+nodeGetText(tdoc, titleNode[0], newsBlk.title);
+}
 }
 
 
@@ -68,7 +75,7 @@ void setBody(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk)
 {
-strcpy(newsBlk.body,"");
+strlcpy(newsBlk.body,"",MAX_BODY_LENGTH);
 }
 
 
@@ -86,12 +93,14 @@ for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
 TidyNode tmpNode[1];
 
 
-//printNode(tdoc, tmpNode[0], 350);
+
 setDate(tdoc, nodesArr[i], newsArr[i]);
 setUrl(tdoc, nodesArr[i], newsArr[i]);
-printf("%s\n", newsArr[i].url);
-//setTitle(tdoc, tmpNode[0], newsArr[i]);
+setTitle(tdoc, nodesArr[i], newsArr[i]);
+//printNode(tdoc, nodesArr[i], 350);
 //setBody(tdoc, tmpNode[0], newsArr[i]);
+printf("%s\n\n", newsArr[i].title);
+printf("%s\n\n", newsArr[i].url);
 
 
 res++;
@@ -121,7 +130,7 @@ res = getNodeById(resNd[0], "newswrap", resNd, 1);
 res = getNodeByClass(resNd[0], "content-wrap", resNd, 1);
 res = getNodeByClass(resNd[0], "news-list div-with-shadow", resNd, 1);
 res = getNodeByName(resNd[0], "ul", resNd, 1); 
-res = getNodeByName(resNd[0], "li", resNd, 1); 
+res = getNodeByName(resNd[0], "li", resNd, 20);
 fillNewsStruct(tdoc, resNd, res, out, out_sz);
 }
 
@@ -143,7 +152,8 @@ TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
 tidyBufInit(&docbuf);
-int err = getHtml("https://fdsarr.ru/arr/news/", &docbuf);
+char* url = BASE_URL "/arr/news/";
+int err = getHtml(url, &docbuf);
 if (err) {
 printf("get%d\n", err);
 exit(2);
