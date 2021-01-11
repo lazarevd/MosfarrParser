@@ -98,18 +98,16 @@ int res = 0;
 for (int i = 0; i < nodesArrSize && i < newsArrSize; i++) {
 //printf("%d", i);
 TidyNode tmpNode[1];
-
-
-
 setDate(tdoc, nodesArr[i], newsArr[i]);
 setUrl(tdoc, nodesArr[i], newsArr[i]);
 setTitle(tdoc, nodesArr[i], newsArr[i]);
+setBody(tdoc, nodesArr[i], newsArr[i]);
 //printNode(tdoc, nodesArr[i], 350);
-//setBody(tdoc, tmpNode[0], newsArr[i]);
-printf("%s\n\n", newsArr[i].title);
-printf("%s\n\n", newsArr[i].url);
-
-
+/*printf("%d,title:%s,body:%s,url:%s\n\n", 
+*newsArr[i].id,
+newsArr[i].title,
+newsArr[i].body,
+newsArr[i].url);*/
 res++;
 }
 return res;
@@ -176,7 +174,13 @@ initNewsBlocks(news, newsSize);
 
 int parsed = parseHtml(&docbuf, news, newsSize);
 printf("parsed %d news\n", parsed);
-/*for (int i = 0; i < parsed; i++){
+for (int i = 0; i < parsed; i++){
+
+printf("\n%d,title:%s,body:%s,url:%s\n", 
+*news[i].id,
+news[i].title,
+news[i].body,
+news[i].url);
 	insertNewsBlock(db, news[i]);
 }
 
@@ -203,5 +207,5 @@ freeNewsBlocks(news, newsSize);
 
 sqlite3_close(db);
 return err;
-*/
+
 }

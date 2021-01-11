@@ -44,8 +44,8 @@ int rc = sqlite3_exec(db, query, 0, 0, &err_msg);
         
         fprintf(stderr, "SQL error: %s\n", err_msg);
         
-        sqlite3_free(err_msg);        
-        sqlite3_close(db);
+       // sqlite3_free(err_msg);        
+       // sqlite3_close(db);
         
         return 1;
     } 
@@ -77,6 +77,15 @@ strcat(query, &i[0]);
 return executeQuery(db, &query[0]);
 }
 
+char* replace_char(char* str, char find, char replace){
+    char *current_pos = strchr(str,find);
+    while (current_pos){
+        *current_pos = replace;
+        current_pos = strchr(current_pos,find);
+    }
+    return str;
+}
+
 int insertNewsBlock(sqlite3 * db, struct NewsBlock nb) {
 
 char query[4000] = "insert or ignore into news_blocks values(";
@@ -87,6 +96,7 @@ strncat(query, &i[0],20);
 strcat(query, ", \"");
 strncat(query, nb.date, 12);
 strcat(query, "\", \"");
+replace_char(nb.title, '\"', '\'');
 strncat(query, nb.title, 500);
 strcat(query, "\", \"");
 strncat(query, nb.url, 700);
@@ -99,30 +109,4 @@ strcat(query, "\", 0, 0)");
 return executeQuery(db, &query[0]);
 
 }
-/*
-int main(void) {
-
-sqlite3 *db;
-
-char *err_msg = 0; 
-
-int rc = sqlite3_open_v2("rr.db", &db, SQLITE_OPEN_READWRITE,NULL);
-size_t arrSz = 20;
-struct NewsBlock * nbs = malloc(sizeof(struct NewsBlock) * arrSz);
-initNewsBlocks(nbs, arrSz);
-nbs[1].id = -12343545;
-nbs[1].date = "28.10.20";
-nbs[1].title = "tit";
-nbs[1].url = "http://url.com";
-
-
-
-//selectNewsBlocksFromDb(db, nbs, arrSz);
-insertNewsBlock(db, &nbs[1]);
-printf("%s%s", "result ", nbs[1].url);
-free(nbs);
-return 0;
-}
-
-*/
 

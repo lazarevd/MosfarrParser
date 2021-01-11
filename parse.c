@@ -100,12 +100,9 @@ void nodeGetText(TidyDoc doc, TidyNode node, char * textDest) {
       TidyBuffer buf;
       tidyBufInit(&buf);
       tidyNodeGetText(doc, node, &buf);
-      strcpy(textDest, buf.bp?(char *)buf.bp:"");
+      char* text = buf.bp?(char *)buf.bp:"";
+      strcpy(textDest, text);
       tidyBufFree(&buf);
       //return res;
 }
 
-
-
-
-/* Traverse the document tree */ 
