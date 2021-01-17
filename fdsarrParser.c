@@ -145,13 +145,9 @@ return res;
 }
 
 
+int startParse(char* token, char* chat_id, char* db_path) {
 
-int main(int argc, char **argv)
-{
-if (argc < 3) {
-printf("%s\n", "usage: ./parse token chat_id db_path");
-exit(1);
-}
+
 
 TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
@@ -166,7 +162,7 @@ exit(2);
 
 sqlite3 *db;
 char *err_msg = 0; 
-int rc = sqlite3_open_v2(argv[3], &db, SQLITE_OPEN_READWRITE,NULL);
+int rc = sqlite3_open_v2(db_path, &db, SQLITE_OPEN_READWRITE,NULL);
 size_t newsSize = 20;
 struct NewsBlock news[newsSize];
 initNewsBlocks(news, newsSize);
@@ -189,14 +185,14 @@ if (selected > 0){
 CURL *curl;
 curl = curl_easy_init();
 char url[200] = "https://api.telegram.org/bot";
-strcat(url, argv[1]);
+strcat(url, token);
 strcat(url, "/sendMessage");
 
 printf("%s\n", url);
 
 for (int i=0; i < selected; i++) {
 setProcessing(db, news[i], 1);
-sendNewsBlock(curl, url, argv[2], news[i],db);
+sendNewsBlock(curl, url, chat_id, news[i],db);
 setSent(db, news[i], 1);
 setProcessing(db, news[i], 0);
 }
@@ -207,5 +203,15 @@ freeNewsBlocks(news, newsSize);
 
 sqlite3_close(db);
 return err;
+}
 
+
+int main(int argc, char **argv)
+{
+
+if (argc < 3) {
+printf("%s\n", "usage: ./parse token chat_id db_path");
+exit(1);
+}
+startParse(argv[1], argv[2], argv[3]);
 }
