@@ -10,16 +10,7 @@
 
 #define BASE_URL "https://fdsarr.ru"
 
-void getAttrVal(TidyNode tNode, char* findAttrName, char* resultValue) {
-	TidyAttr attr;
-      for(attr = tidyAttrFirst(tNode); attr; attr = tidyAttrNext(attr) ) {
-	ctmbstr attName = tidyAttrName(attr);      
-	ctmbstr attVal = tidyAttrValue(attr);      
-        	if (strcmp(findAttrName, attName) == 0) {
-        	strlcpy(resultValue, attVal, 1000);
-		}
-	}
-} 
+
 void setDate(TidyDoc tdoc,
 		  TidyNode newsNode,
 		  struct NewsBlock newsBlk) {

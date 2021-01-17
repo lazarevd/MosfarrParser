@@ -16,3 +16,4 @@ int getNodeByName(TidyNode parentNode, ctmbstr findName, TidyNode * resultArr,in
 
 void nodeGetText(TidyDoc doc, TidyNode node, char * textDest);
 
+void getAttrVal(TidyNode tNode, char* findAttrName, char* resultValue);

@@ -6,6 +6,7 @@
 #include <sqlite3.h>
 #include "sql.h"
 #include "sender.h"
+#include "utils.h"
 
 size_t write_cb(char *in, size_t size, size_t nmemb, TidyBuffer *userdata) {
 uint r;
@@ -106,3 +107,13 @@ void nodeGetText(TidyDoc doc, TidyNode node, char * textDest) {
       //return res;
 }
 
+void getAttrVal(TidyNode tNode, char* findAttrName, char* resultValue) {
+	TidyAttr attr;
+      for(attr = tidyAttrFirst(tNode); attr; attr = tidyAttrNext(attr) ) {
+	ctmbstr attName = tidyAttrName(attr);      
+	ctmbstr attVal = tidyAttrValue(attr);      
+        	if (strcmp(findAttrName, attName) == 0) {
+        	strlcpy(resultValue, attVal, 1000);
+		}
+	}
+} 
