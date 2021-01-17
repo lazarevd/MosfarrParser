@@ -4,16 +4,23 @@
 #include <stdlib.h>
 #include "newsblock.h"
 
-int selectUnsentNewsBlocksFromDb(sqlite3 * db, 
+int openDb(sqlite3 ** db, char* db_path) {
+return sqlite3_open_v2(db_path, db, SQLITE_OPEN_READWRITE , NULL);
+}
+
+int selectUnsentNewsBlocksFromDb(char * db_path, 
 			    struct NewsBlock * nbs,
 			    size_t arrSz) {
 char *sql = 	"SELECT * FROM news_blocks "
 		"WHERE processing = 0 "
 		"AND sent = 0";
 
+
+sqlite3 *db = NULL;
+int rc = openDb(&db, db_path);
 sqlite3_stmt *stmt;
 
-int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 if (rc != SQLITE_OK) {
     printf("%s%s\n", "error: ", sqlite3_errmsg(db));
 }
@@ -32,13 +39,15 @@ while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && cnt < arrSz) {
     cnt++;
 }
 sqlite3_finalize(stmt);
+sqlite3_close(db);
 return cnt;
 }
 
-int executeQuery(sqlite3 * db, char * query) {
-
+int executeQuery(char * db_path, char * query) {
+sqlite3 *db = NULL;
+int rc = openDb(&db, db_path);
 char *err_msg = 0;
-int rc = sqlite3_exec(db, query, 0, 0, &err_msg);
+rc = sqlite3_exec(db, query, 0, 0, &err_msg);
     
     if (rc != SQLITE_OK ) {
         
@@ -51,10 +60,12 @@ int rc = sqlite3_exec(db, query, 0, 0, &err_msg);
     } 
 
 printf("%s\n", query);
+sqlite3_close(db);
 return rc;
 }
 
-int setProcessing(sqlite3 * db, struct NewsBlock nb, int val) {
+int setProcessing(char * db_path, struct NewsBlock nb, int val) {
+
 char query[200] = "update news_blocks set processing =  ";
 char i[100];
 sprintf(i, "%d", val);
@@ -62,11 +73,11 @@ strcat(query, &i[0]);
 strcat(query, " where id = ");
 sprintf(i, "%d", *nb.id);
 strcat(query, &i[0]);
-return executeQuery(db, &query[0]);
+return executeQuery(db_path, &query[0]);
 }
 
 
-int setSent(sqlite3 * db, struct NewsBlock nb, int val) {
+int setSent(char * db_path, struct NewsBlock nb, int val) {
 char query[200] = "update news_blocks set sent = ";
 char i[100];
 sprintf(i, "%d", val);
@@ -74,7 +85,7 @@ strcat(query, &i[0]);
 strcat(query, " where id = ");
 sprintf(i, "%d", *nb.id);
 strcat(query, &i[0]);
-return executeQuery(db, &query[0]);
+return executeQuery(db_path, &query[0]);
 }
 
 char* replace_char(char* str, char find, char replace){
@@ -86,7 +97,7 @@ char* replace_char(char* str, char find, char replace){
     return str;
 }
 
-int insertNewsBlock(sqlite3 * db, struct NewsBlock nb) {
+int insertNewsBlock(char * db_path, struct NewsBlock nb) {
 
 char query[4000] = "insert or ignore into news_blocks values(";
 
@@ -105,8 +116,6 @@ strncat(query, nb.body, 700);
 strcat(query, "\", 0, 0)");
 
 
-
-return executeQuery(db, &query[0]);
-
+return executeQuery(db_path, &query[0]);
 }
 

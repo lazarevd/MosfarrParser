@@ -3,12 +3,12 @@
 #include "newsblock.h"
 
 
-int selectUnsentNewsBlocksFromDb(sqlite3 * db, 
+int selectUnsentNewsBlocksFromDb(char * db_path, 
 			    struct NewsBlock * nbs,
 			    size_t arrSz);
 
-int insertNewsBlock(sqlite3 * db, struct NewsBlock  nb);
+int insertNewsBlock(char * db_path, struct NewsBlock  nb);
 
-int setProcessing(sqlite3 * db, struct NewsBlock nb, int val);
+int setProcessing(char * db_path, struct NewsBlock nb, int val);
 
-int setSent(sqlite3 * db, struct NewsBlock nb, int val);
+int setSent(char * db_path, struct NewsBlock nb, int val);

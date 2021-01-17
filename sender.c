@@ -8,8 +8,8 @@ int sendNewsBlock(CURL * curl,
 char * url,
 char * chatId,		 
 struct NewsBlock nb,
-sqlite3 * db) {
-setProcessing(db, nb, 1);
+char * db_path) {
+setProcessing(db_path, nb, 1);
 int res = 0;
 struct curl_slist *list = NULL;
 list = curl_slist_append(list, "Content-Type: application/json");
@@ -27,9 +27,9 @@ curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
 printf("%s %d/n", "start send to chat message", *nb.id);
 res = curl_easy_perform(curl);
 if (res == 0) {
-setSent(db, nb, 1);
+setSent(db_path, nb, 1);
 }
-setProcessing(db, nb, 0);
+setProcessing(db_path, nb, 0);
 return res;
 }
 /*

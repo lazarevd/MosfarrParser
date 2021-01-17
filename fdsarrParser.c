@@ -3,7 +3,6 @@
 #include <tidy.h>
 #include <tidybuffio.h>
 #include "newsblock.h"
-#include <sqlite3.h>
 #include "sql.h"
 #include "sender.h"
 #include "parse.h"
@@ -147,8 +146,6 @@ return res;
 
 int startParse(char* token, char* chat_id, char* db_path) {
 
-
-
 TidyBuffer docbuf = {0};
 //tidyOptSetBool(tdoc, TidyForceOutput, yes);
 //tidyOptSetInt(tdoc, TidyWrapLen, 4096);
@@ -160,9 +157,8 @@ printf("get%d\n", err);
 exit(2);
 }
 
-sqlite3 *db;
 char *err_msg = 0; 
-int rc = sqlite3_open_v2(db_path, &db, SQLITE_OPEN_READWRITE,NULL);
+
 size_t newsSize = 20;
 struct NewsBlock news[newsSize];
 initNewsBlocks(news, newsSize);
@@ -177,10 +173,10 @@ printf("\n%d,title:%s,body:%s,url:%s\n",
 news[i].title,
 news[i].body,
 news[i].url);
-	insertNewsBlock(db, news[i]);
+	insertNewsBlock(db_path, news[i]);
 }
 
-int selected = selectUnsentNewsBlocksFromDb(db,news, newsSize);
+int selected = selectUnsentNewsBlocksFromDb(db_path, news, newsSize);
 if (selected > 0){
 CURL *curl;
 curl = curl_easy_init();
@@ -191,17 +187,17 @@ strcat(url, "/sendMessage");
 printf("%s\n", url);
 
 for (int i=0; i < selected; i++) {
-setProcessing(db, news[i], 1);
-sendNewsBlock(curl, url, chat_id, news[i],db);
-setSent(db, news[i], 1);
-setProcessing(db, news[i], 0);
+setProcessing(db_path, news[i], 1);
+sendNewsBlock(curl, url, chat_id, news[i], db_path);
+setSent(db_path, news[i], 1);
+setProcessing(db_path, news[i], 0);
 }
 curl_easy_cleanup(curl);
 }
 
 freeNewsBlocks(news, newsSize);
 
-sqlite3_close(db);
+
 return err;
 }
 

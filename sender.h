@@ -8,4 +8,4 @@ int sendNewsBlock(CURL * curl,
 char * url,
 char * chatId,		 
 struct NewsBlock nb,
-sqlite3 * db);
+char * db_path);
